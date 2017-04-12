@@ -8,6 +8,9 @@ namespace Lottery.Engine
 {
     public interface IRules
     {
-        bool CanPlayer();
+        ushort MinimumPlayerAge { get; }
+        bool CanPlay(ushort age);      
+        ushort[] GenerateDraw();
+        bool HasPlayerWon(IEnumerable<ushort> drawnNumbers, IEnumerable<ushort> playerNumbers);
     }
 }

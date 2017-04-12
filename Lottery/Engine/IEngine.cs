@@ -8,6 +8,6 @@ namespace Lottery.Engine
 {
     public interface IEngine
     {
-        void Run();
+        void Run(IEnumerable<IPlayer> players);
     }
 }

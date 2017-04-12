@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Lottery.Engine;
 using Autofac;
+using Lottery.Engine;
+using Lottery.NationalLottery;
 
 namespace Lottery
 {
@@ -14,20 +15,48 @@ namespace Lottery
 
         static void Main(string[] args)
         {
+            // Entry point for program.          
+            RunNationalLottery();
+            //RunEuroLottery();                     
+            Console.ReadKey();            
+        }
+
+        private static void RunNationalLottery()
+        {
             var builder = new ContainerBuilder();
-            builder.RegisterType<NationalLottery>().As<IEngine>();
-            builder.RegisterType<ShortRandomNumberGenerator>().As<IRandomNumberGenerator<ushort>>();
+            builder.RegisterType<Engine.Engine>().As<IEngine>();
+
+            // National Lottery Dependencies....
+            builder.RegisterType<ShortRandomNumberGenerator>().As<IRandomNumberGenerator<ushort>>();           
+            builder.RegisterType<NationalLotteryRules>().As<IRules>();
             container = builder.Build();
 
-            // Entry point for program.
+            var nationalLotteryPlayers = new List<NationalLotteryPlayer>();
+            nationalLotteryPlayers.Add(new NationalLotteryPlayer(15, new ushort[] { 1, 2, 3, 4, 5, 6 }));
+            nationalLotteryPlayers.Add(new NationalLotteryPlayer(16, new ushort[] { 1, 2, 3, 4, 5, 6 }));            
 
-            using (var scope = container.BeginLifetimeScope() )
+            using (var scope = container.BeginLifetimeScope())
             {
                 IEngine nationalLottery = scope.Resolve<IEngine>();
-                nationalLottery.Run();
+                nationalLottery.Run(nationalLotteryPlayers);
             }
+        }
 
-            Console.ReadKey();            
+        private static void RunEuroLottery()
+        {
+            var builder = new ContainerBuilder();
+            builder.RegisterType<Engine.Engine>().As<IEngine>();
+
+            // Euro Lottery Dependencies...
+            //builder.RegisterType<SecureRandomNumberGenerator>().As<IRandomNumberGenerator<ushort>>();          
+            //builder.RegisterType<EuroLotteryRules>().As<IRules>();
+            container = builder.Build();
+
+            using (var scope = container.BeginLifetimeScope())
+            {
+                //IEngine nationalLottery = scope.Resolve<IEngine>();
+                //nationalLottery.Run();
+            }
         }
     }
 }
